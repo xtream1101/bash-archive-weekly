@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# This script has to finish within 24hrs of the prev week ending
-#   This is because the offset will max out at 1 day
-#   If it is run any later you will miss days in the archive
-
 # Handle args
 if [ "$#" -lt 2 ]; then
     echo ""
@@ -27,7 +23,6 @@ total_offset=$(( $previous_days_offset + $current_day_offset ))
 files_newer=$(( (60*24*7) + $total_offset ))
 files_older=$(( $total_offset + 1 ))  # +1 is so we get 11:59 and not 00:00
 
-
 start_year=`date --date="$files_newer minutes ago" +%Y`
 start_month=`date --date="$files_newer minutes ago" +%m`
 start_day=`date --date="$files_newer minutes ago" +%d`
@@ -42,12 +37,8 @@ end_day="${end_year}-${end_month}-${end_day}"
 
 archive_name="${filename_prefix}${week}_${start_day}_-_${end_day}.tar.gz"
 
-echo "$archive_name"
-
-exit
 cd $source_location && find . -type f \
     -mmin -$files_newer \
     -mmin +$files_older | \
     sed 's/.*/"&"/' | \
     xargs tar -zcvf $archive_name 
-
